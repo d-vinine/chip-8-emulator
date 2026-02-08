@@ -90,16 +90,19 @@ void chip8_cycle(Chip8 *const chip) {
         case 0x7: chip8_OP_8XY7(chip); break;
         case 0xE: chip8_OP_8XYE(chip); break;
       }
+      break;
     case 0x0:
       switch(chip->opcode & 0x000F) {
         case 0x0: chip8_OP_00E0(chip); break;
         case 0xE: chip8_OP_00EE(chip); break;
       }
+      break;
     case 0xE:
       switch(chip->opcode & 0x00FF) {
         case 0xA1: chip8_OP_EXA1(chip); break;
         case 0x9E: chip8_OP_EX9E(chip); break;
       }
+      break;
     case 0xF:
       switch(chip->opcode & 0x00FF) {
         case 0x07: chip8_OP_FX07(chip); break;
@@ -112,6 +115,7 @@ void chip8_cycle(Chip8 *const chip) {
         case 0x55: chip8_OP_FX55(chip); break;
         case 0x65: chip8_OP_FX65(chip); break;
       }
+      break;
   }
 
   if (chip->delay_timer > 0) {

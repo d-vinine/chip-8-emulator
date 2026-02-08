@@ -1,6 +1,6 @@
-#include <string.h>
 #include "opcodes.h"
 #include "chip8.h"
+#include <string.h>
 
 void chip8_OP_00E0(Chip8 *const chip) {
   memset(chip->disp_buffer, 0, sizeof(chip->disp_buffer));
@@ -179,23 +179,31 @@ void chip8_OP_DXYN(Chip8 *const chip) {
   uint8_t Vy = (chip->opcode & 0x00F0) >> 4;
   uint8_t n = chip->opcode & 0x000F;
 
-  uint8_t x = chip->registers[Vx] % DISP_WIDTH;
-  uint8_t y = chip->registers[Vy] % DISP_HEIGHT;
+  uint8_t xPos = chip->registers[Vx] % DISP_WIDTH;
+  uint8_t yPos = chip->registers[Vy] % DISP_HEIGHT;
 
   chip->registers[0xF] = 0;
 
-  for (int i = 0; i < n; i++) {
-    uint8_t spriteByte = chip->memory[chip->index + i];
+  for (int row = 0; row < n; row++) {
+    if (yPos + row >= DISP_HEIGHT)
+      break;
 
-    for (int j = 0; j < 8; j++) {
-      uint8_t spritePixel = (spriteByte >> j) & 1;
-      uint8_t *screenPixel = &chip->disp_buffer[(y + i) * DISP_WIDTH + (x + j)];
+    uint8_t spriteByte = chip->memory[chip->index + row];
 
-      if (*screenPixel) {
-        chip->registers[0xF] = 1;
+    for (int col = 0; col < 8; col++) {
+      if (xPos + col >= DISP_WIDTH)
+        break;
+
+      if (spriteByte & (0x80 >> col)) {
+        uint8_t *screenPixel =
+            &chip->disp_buffer[(yPos + row) * DISP_WIDTH + (xPos + col)];
+
+        if (*screenPixel == 1) {
+          chip->registers[0xF] = 1;
+        }
+
+        *screenPixel ^= 1;
       }
-
-      *screenPixel ^= 1;
     }
   }
 }
@@ -319,5 +327,3 @@ void chip8_OP_FX65(Chip8 *const chip) {
     chip->registers[i] = chip->memory[chip->index + i];
   }
 }
-
-
