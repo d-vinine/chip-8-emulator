@@ -1,3 +1,6 @@
 .direnv
 .envrc
-
+build/
+flake.nix
+flake.lock
+chip8
