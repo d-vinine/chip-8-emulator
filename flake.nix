@@ -14,18 +14,13 @@
       {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
-            gcc 
+            gcc
             gnumake
             cmake
             pkg-config
-            gdb 
-            valgrind 
+            gdb
+            valgrind
             clang-tools
-          ];
-
-          # Libraries your project links against
-          buildInputs = with pkgs; [
-            # Add libraries here (e.g., check, openssl, zlib)
           ];
 
           shellHook = ''
@@ -33,6 +28,13 @@
             echo "Compiler: $(gcc --version | head -n 1)"
             echo "Build tools: make, cmake, pkg-config"
           '';
+        };
+
+        pkgs.default = pkgs.stdenv.mkDerivation {
+          pname = "chip-8-emulator";
+          version = "0.1";
+          src = ./src;
+          nativeBuildInputs = [ pkgs.cmake pkgs.gcc ];
         };
       });
 }

@@ -42,6 +42,7 @@ void renderer_update(uint8_t *const buffer) {
   }
   fflush(stdout);
 }
+
 int renderer_process_input(uint8_t *keys) {
 
   uint8_t ch;
@@ -111,7 +112,7 @@ int renderer_process_input(uint8_t *keys) {
     return -1;
   }
 
-  return 1; // Key was processed
+  return 1; 
 }
 
 void renderer_close(struct termios *old_settings) {
