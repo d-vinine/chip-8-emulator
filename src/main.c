@@ -25,9 +25,6 @@ int main(int argc, char **argv) {
   struct termios old;
   renderer_init(&old);
   while (run) {
-    if (renderer_process_input(chip.keypad) == -1) {
-      run = 0;
-    }
 
     clock_gettime(CLOCK_MONOTONIC, &current_time);
 
@@ -36,6 +33,10 @@ int main(int argc, char **argv) {
 
     if (dt >= cycle_delay_ms) {
       last_time = current_time;
+
+      if (renderer_process_input(chip.keypad) == -1) {
+        run = 0;
+      }
 
       chip8_cycle(&chip);
 
