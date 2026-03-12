@@ -62,8 +62,15 @@ uint8_t chip8_rand_byte() { return lrand48() % 256; }
 
 void chip8_cycle(Chip8 *const chip) {
   chip->opcode = (chip->memory[chip->pc] << 8) | chip->memory[chip->pc + 1]; 
-
   chip->pc += 2;
+
+  if (chip->delay_timer > 0) {
+    chip->delay_timer--;
+  }
+
+  if (chip->sound_timer > 0) {
+    chip->sound_timer--;
+  }
 
   switch ((chip->opcode & 0xF000) >> 12) {
     case 0x1: chip8_OP_1NNN(chip); break;
@@ -116,14 +123,6 @@ void chip8_cycle(Chip8 *const chip) {
         case 0x65: chip8_OP_FX65(chip); break;
       }
       break;
-  }
-
-  if (chip->delay_timer > 0) {
-    chip->delay_timer--;
-  }
-
-  if (chip->sound_timer > 0) {
-    chip->sound_timer--;
   }
 }
 

@@ -22,6 +22,10 @@
             valgrind
             clang-tools
           ];
+          
+          buildInputs = with pkgs; [
+            raylib
+          ];
 
           shellHook = ''
             echo "--- C Development Environment Loaded ---"

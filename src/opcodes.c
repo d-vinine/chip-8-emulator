@@ -99,53 +99,55 @@ void chip8_OP_8XY4(Chip8 *const chip) {
 
   uint16_t sum = chip->registers[Vx] + chip->registers[Vy];
 
+  chip->registers[Vx] = sum & 0xFFu;
+
   if (sum > 0xFFu) {
     chip->registers[0xF] = 1;
   } else {
     chip->registers[0xF] = 0;
   }
-
-  chip->registers[Vx] = sum & 0xFFu;
 }
 
 void chip8_OP_8XY5(Chip8 *const chip) {
   uint8_t Vx = (chip->opcode & 0x0F00u) >> 8;
   uint8_t Vy = (chip->opcode & 0x00F0u) >> 4;
 
-  if (chip->registers[Vx] > chip->registers[Vy]) {
+  if (chip->registers[Vx] >= chip->registers[Vy]) {
+    chip->registers[Vx] -= chip->registers[Vy];
     chip->registers[0xF] = 1;
   } else {
+    chip->registers[Vx] -= chip->registers[Vy];
     chip->registers[0xF] = 0;
   }
-
-  chip->registers[Vx] -= chip->registers[Vy];
 }
 
 void chip8_OP_8XY6(Chip8 *const chip) {
   uint8_t Vx = (chip->opcode & 0x0F00u) >> 8;
+  uint8_t lsb = chip->registers[Vx] & 0x1;
 
-  chip->registers[0xF] = chip->registers[Vx] & 0x1;
-  chip->registers[Vx] >>= 1;
+  chip->registers[Vx] = chip->registers[Vx] >> 1;
+  chip->registers[0xF] = lsb;
 }
 
 void chip8_OP_8XY7(Chip8 *const chip) {
   uint8_t Vx = (chip->opcode & 0x0F00u) >> 8;
   uint8_t Vy = (chip->opcode & 0x00F0u) >> 4;
 
-  if (chip->registers[Vy] > chip->registers[Vx]) {
+  if (chip->registers[Vy] >= chip->registers[Vx]) {
+    chip->registers[Vx] = chip->registers[Vy] - chip->registers[Vx];
     chip->registers[0xF] = 1;
   } else {
+    chip->registers[Vx] = chip->registers[Vy] - chip->registers[Vx];
     chip->registers[0xF] = 0;
   }
-
-  chip->registers[Vx] = chip->registers[Vy] - chip->registers[Vx];
 }
 
 void chip8_OP_8XYE(Chip8 *const chip) {
   uint8_t Vx = (chip->opcode & 0x0F00u) >> 8;
+  uint8_t msb = (chip->registers[Vx] & 0x80) >> 7;
 
-  chip->registers[0xF] = (chip->registers[Vx] & 0x80) >> 7;
   chip->registers[Vx] <<= 1;
+  chip->registers[0xF] = msb;
 }
 
 void chip8_OP_9XY0(Chip8 *const chip) {
@@ -235,45 +237,22 @@ void chip8_OP_FX07(Chip8 *const chip) {
 }
 
 void chip8_OP_FX0A(Chip8 *const chip) {
-  uint8_t Vx = (chip->opcode & 0x0F00) >> 8;
+  uint8_t Vx = (chip->opcode & 0x0F00u) >> 8;
+  int key_pressed = -1;
 
-  if (chip->keypad[0]) {
-    chip->registers[Vx] = 0;
-  } else if (chip->keypad[1]) {
-    chip->registers[Vx] = 1;
-  } else if (chip->keypad[2]) {
-    chip->registers[Vx] = 2;
-  } else if (chip->keypad[3]) {
-    chip->registers[Vx] = 3;
-  } else if (chip->keypad[4]) {
-    chip->registers[Vx] = 4;
-  } else if (chip->keypad[5]) {
-    chip->registers[Vx] = 5;
-  } else if (chip->keypad[6]) {
-    chip->registers[Vx] = 6;
-  } else if (chip->keypad[7]) {
-    chip->registers[Vx] = 7;
-  } else if (chip->keypad[8]) {
-    chip->registers[Vx] = 8;
-  } else if (chip->keypad[9]) {
-    chip->registers[Vx] = 9;
-  } else if (chip->keypad[10]) {
-    chip->registers[Vx] = 10;
-  } else if (chip->keypad[11]) {
-    chip->registers[Vx] = 11;
-  } else if (chip->keypad[12]) {
-    chip->registers[Vx] = 12;
-  } else if (chip->keypad[13]) {
-    chip->registers[Vx] = 13;
-  } else if (chip->keypad[14]) {
-    chip->registers[Vx] = 14;
-  } else if (chip->keypad[15]) {
-    chip->registers[Vx] = 15;
+  for (int i = 0; i < 16; i++) {
+    if (chip->keypad[i]) {
+      key_pressed = i;
+      break;
+    }
+  }
+
+  if (key_pressed != -1) {
+    chip->registers[Vx] = (uint8_t)key_pressed;
   } else {
     chip->pc -= 2;
   }
 }
-
 void chip8_OP_FX15(Chip8 *const chip) {
   uint8_t Vx = (chip->opcode & 0x0F00) >> 8;
 
