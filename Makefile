@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -Isrc -O3
 TARGET = chip8
 BUILD_DIR = build
 
-SRCS = src/main.c src/chip8.c src/opcodes.c src/renderer.c
+SRCS = src/main.c src/chip8.c src/opcodes.c 
 
 OBJS = $(SRCS:src/%.c=$(BUILD_DIR)/%.o)
 

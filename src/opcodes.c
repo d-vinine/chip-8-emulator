@@ -77,6 +77,7 @@ void chip8_OP_8XY1(Chip8 *const chip) {
   uint8_t Vy = (chip->opcode & 0x00F0u) >> 4;
 
   chip->registers[Vx] |= chip->registers[Vy];
+  chip->registers[0xF] = 0;
 }
 
 void chip8_OP_8XY2(Chip8 *const chip) {
@@ -84,6 +85,7 @@ void chip8_OP_8XY2(Chip8 *const chip) {
   uint8_t Vy = (chip->opcode & 0x00F0u) >> 4;
 
   chip->registers[Vx] &= chip->registers[Vy];
+  chip->registers[0xF] = 0;
 }
 
 void chip8_OP_8XY3(Chip8 *const chip) {
@@ -91,6 +93,7 @@ void chip8_OP_8XY3(Chip8 *const chip) {
   uint8_t Vy = (chip->opcode & 0x00F0u) >> 4;
 
   chip->registers[Vx] ^= chip->registers[Vy];
+  chip->registers[0xF] = 0;
 }
 
 void chip8_OP_8XY4(Chip8 *const chip) {
@@ -240,7 +243,8 @@ void chip8_OP_FX0A(Chip8 *const chip) {
   uint8_t Vx = (chip->opcode & 0x0F00u) >> 8;
   int key_pressed = -1;
 
-  for (int i = 0; i < 16; i++) {
+  int i;
+  for (i = 0; i < 16; i++) {
     if (chip->keypad[i]) {
       key_pressed = i;
       break;
@@ -305,4 +309,6 @@ void chip8_OP_FX65(Chip8 *const chip) {
   for (uint8_t i = 0; i <= Vx; i++) {
     chip->registers[i] = chip->memory[chip->index + i];
   }
+
+  chip->index++;
 }
